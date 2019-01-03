@@ -14,10 +14,30 @@ require_once("config.php");
 //Carrega uma pesquisa por login
 //$search = Usuario::search2("dale");
 //echo json_encode($search);
-//-----------------------------
+//------------------------------
 //Carrega um usuário usando o login e a senha
+//$usuario = new Usuario();
+//$usuario->login("mec","meczada");
+//echo $usuario;
+//------------------------------
+//Insert user
+//$aluno = new Usuario();
+//$aluno->setDesLogin("aluno");
+//$aluno->setDesSenha("DELE");
+//$aluno->insert();
+//echo $aluno;
+//------------------------------
+//Insert user(2ºmétodo)
+//$aluno = new Usuario();
+//$aluno->setDesLogin("aluno");
+//$aluno->setDesSenha("mec");
+//$aluno->insert2();
+//echo $aluno;
+//------------------------------
+//Update user
 $usuario = new Usuario();
-$usuario->login("mec","meczada");
+$usuario->loadById(6);
+$usuario->update("Lucas", "dale");
 echo $usuario;
 
 ?>

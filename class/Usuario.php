@@ -46,12 +46,7 @@ class Usuario
 			array(":ID"=>$id));
 		if(count($result)> 0 )
 		{
-			$row = $result[0];
-
-			$this->setIdUsuario($row['idusuario']);
-			$this->setDesLogin($row['deslogin']);
-			$this->setDesSenha($row['dessenha']);
-			$this->setDtCadastro(new DateTime($row['dtcadastro']));
+			$this->setData($result[0]);
 		}
 	}
 	public static function getList()
@@ -76,17 +71,54 @@ class Usuario
 			array(":LOGIN"=>$login,":PASSWORD"=>$password));
 		if(count($result)> 0 )
 		{
-			$row = $result[0];
-
-			$this->setIdUsuario($row['idusuario']);
-			$this->setDesLogin($row['deslogin']);
-			$this->setDesSenha($row['dessenha']);
-			$this->setDtCadastro(new DateTime($row['dtcadastro']));
+		
+			$this->setData($result[0]);
 		} else
 		{
 			throw new Exception("Login e/ou senha inválidos.");
 			
 		}
+	}
+
+	public function setData($data)
+	{
+			$this->setIdUsuario($data['idusuario']);
+			$this->setDesLogin($data['deslogin']);
+			$this->setDesSenha($data['dessenha']);
+			$this->setDtCadastro(new DateTime($data['dtcadastro']));
+	}
+
+	public function insert()//Primeira maneira
+	{
+		$sql = new Sql();
+		$results = $sql->select("INSERT INTO tb_usuarios(deslogin,dessenha) VALUES(:LOGIN, :PASSWORD)", array(
+			':LOGIN'=>$this->getDesLogin()
+			,':PASSWORD'=>$this->getDesSenha()
+		));
+		$results2 = $sql->select("SELECT * FROM tb_usuarios WHERE idusuario = LAST_INSERT_ID()");
+		if(count($results2) > 0)
+		{
+			$this->setData($results2[0]);
+		}
+	}
+
+	public function insert2()
+	{
+		$sql = new Sql();
+
+		$results = $sql->select("CALL sp_usuarios_insert(:LOGIN,:PASSWORD)",array(
+			":LOGIN"=>$this->getDesLogin(),":PASSWORD"=>$this->getDesSenha()));
+		if(count($results)>0)
+		{
+			$this->setData($results[0]);
+		}
+	}
+	public function update($login,$password)
+	{
+		$this->setDesLogin($login);
+		$this->setDesSenha($password);
+		$sql = new Sql();
+		$sql->query("UPDATE tb_usuarios SET deslogin = :LOGIN, dessenha = :PASSWORD WHERE idusuario = :ID",array(":LOGIN"=>$this->getDesLogin(),":PASSWORD"=>$this->getDesSenha(),":ID"=>$this->getIdUsuario()));
 	}
 	public function __toString()
 	{
@@ -96,6 +128,7 @@ class Usuario
 			,"dessenha"=>$this->getDesSenha()
 			,"dtcadastro"=>$this->getDtCadastro()->format("d/m/y H:i:s")
 		));
+
 	}
 }
 ?>
